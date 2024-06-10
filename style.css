@@ -1,0 +1,54 @@
+
+body{
+    display: flex;
+    justify-content: center;
+    font-size:xx-large;
+    }
+
+*{
+    margin:0;
+    padding:0;
+}
+
+.container{
+    display:flex;
+    flex-wrap: wrap;    ;
+    width:400px;
+    border:solid 10px black;
+    background-color: black;
+    margin-top: 20px;
+}
+
+.display{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    aspect-ratio: 1/0.2;
+    flex-basis:100%;
+    border:solid 5px black;
+    background-color: rgb(216, 211, 211);
+    font-size: 65px;
+}
+
+.input{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1/0.8;
+    flex-basis: calc(25% - 4px);
+    border-radius: 5px;
+    border:solid 2px black;
+    background-color: rgb(132, 132, 187);
+   }
+.input.digit, .input.decimal{
+background-color: rgb(58, 133, 58);
+}
+
+.input.operand{
+background-color: rgb(231, 183, 93);
+}
+
+#zero{
+    aspect-ratio: 1/0.2;
+    flex-basis: calc(50% - 4px);  
+}
