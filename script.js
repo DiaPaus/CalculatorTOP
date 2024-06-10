@@ -34,7 +34,7 @@ function addDigits(){
 }
 
 function addDecimal(){if(!display.innerHTML.includes('.')&&display.innerHTML.length<11) 
-    {display.innerHTML+=this.textContent; newOperator=false}}
+    {display.innerHTML+='.'; newOperator=false}}
 
 function actionOperand(){ 
     if(operand&&newOperator)  {operand=this.innerHTML;return} 
@@ -76,4 +76,32 @@ decimal.addEventListener('click',addDecimal);
 operands.forEach(el=>el.addEventListener('click',actionOperand));
 sign.addEventListener('click',signChange);
 del.addEventListener('click',deleteDigit);
-clr.addEventListener('click',clearAll)
+clr.addEventListener('click',clearAll);
+
+//Keyboard support
+document.addEventListener('keyup',function({key}){
+      if ([0,1,2,3,4,5,6,7,8,9].includes(+key)) {
+        if (newOperator) {display.innerHTML='';newOperator=false;}
+        if(display.innerHTML.length<11) display.innerHTML+=key
+      }
+      else if(key==='.') addDecimal();
+      else if(key==='delete' || key==='backspace') deleteDigit();
+      else if(['=','+','-','*','/'].includes(key)) {
+        if(operand&&newOperator)  {operand=key;return} 
+        if(!firstOperator&&!secondOperator){
+            firstOperator=display.innerHTML;
+            operand=key;
+            newOperator=true;
+            }
+        else if(firstOperator&&!secondOperator){
+            secondOperator=display.innerHTML;
+            firstOperator=operate(+firstOperator,+secondOperator,operand);
+                if(Math.abs(firstOperator)>99999999999) display.innerHTML='ERR';
+                else if(firstOperator%1) firstOperator=+firstOperator.toFixed(10-(Math.trunc(firstOperator)+'').length)        
+                else display.innerHTML=firstOperator;
+            secondOperator=null;
+            operand=key;
+            newOperator=true;
+            }
+      }
+})
