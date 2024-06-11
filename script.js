@@ -1,56 +1,45 @@
 let firstOperator=null;
-let secondOperator=null;
 let operand='';
 let newOperator=true;
 
-const digits=document.querySelectorAll('.digit');
+const inputs=document.querySelectorAll('.input');
 const display=document.querySelector('.display');
-const decimal=document.querySelector('.decimal');
-const operands=document.querySelectorAll('.operand');
-const sign=document.querySelector('.sign');
-const del=document.querySelector('.delete');
-const clr=document.querySelector('.clear');
-
-const add=(a,b)=>a+b;
-const subtract=(a,b)=>a-b;
-const multiply=(a,b)=>a*b;
-const divide=(a,b)=>a/b;
 
 const operate=function(firstOperator,secondOperator,operand){
     switch (operand){
-        case'+': return add(firstOperator,secondOperator);
-        case'-': return subtract(firstOperator,secondOperator);
-        case'*': return multiply(firstOperator,secondOperator);
+        case'+': return firstOperator + secondOperator;
+        case'-': return firstOperator - secondOperator;
+        case'*': return firstOperator * secondOperator;
         case'/': {
             if(secondOperator==0) return Infinity
-            else return divide(firstOperator,secondOperator);}
+            else return firstOperator / secondOperator;}
         default: return firstOperator;
     }       
 }
 
-function addDigits(){
+function addDigits(addedDigit){
     if (newOperator) {display.innerHTML='';newOperator=false;}
-    if(display.innerHTML.length<11) display.innerHTML+=this.textContent
+    if(display.innerHTML.length<11) display.innerHTML+=addedDigit
 }
 
 function addDecimal(){if(!display.innerHTML.includes('.')&&display.innerHTML.length<11) 
     {display.innerHTML+='.'; newOperator=false}}
 
-function actionOperand(){ 
+function actionOperand(inputOperand){ 
     if(operand&&newOperator)  {operand=this.innerHTML;return} 
-    if(!firstOperator&&!secondOperator){
+    if(!firstOperator){
         firstOperator=display.innerHTML;
-        operand=this.innerHTML;
+        operand=inputOperand;
         newOperator=true;
     }
-    else if(firstOperator&&!secondOperator){
-        secondOperator=display.innerHTML;
+    else if(firstOperator){
+        let secondOperator=display.innerHTML;
         firstOperator=operate(+firstOperator,+secondOperator,operand);
         if(Math.abs(firstOperator)>99999999999) display.innerHTML='ERR';
-        else if(firstOperator%1) firstOperator=+firstOperator.toFixed(10-(Math.trunc(firstOperator)+'').length)        
-        else display.innerHTML=firstOperator;
-        secondOperator=null;
-        operand=this.innerHTML;
+        else 
+            {if(firstOperator%1) firstOperator=+firstOperator.toFixed(10-(Math.trunc(firstOperator)+'').length)        
+            display.innerHTML=firstOperator;}
+        operand=inputOperand;
         newOperator=true;
     }
 }
@@ -71,37 +60,19 @@ function signChange(){
     display.innerHTML= - +display.innerHTML
 }
 
-digits.forEach(el=>el.addEventListener('click',addDigits));
-decimal.addEventListener('click',addDecimal);
-operands.forEach(el=>el.addEventListener('click',actionOperand));
-sign.addEventListener('click',signChange);
-del.addEventListener('click',deleteDigit);
-clr.addEventListener('click',clearAll);
+inputs.forEach(el=>el.addEventListener('click',function(){
+if ([...el.classList].includes('digit')) addDigits(this.textContent);
+else if([...el.classList].includes('decimal')) addDecimal.call(el);
+else if([...el.classList].includes('operand')) actionOperand(this.innerHTML);
+else if([...el.classList].includes('sign')) signChange.call(el);
+else if([...el.classList].includes('delete')) deleteDigit.call(el);
+else if([...el.classList].includes('clear')) clearAll.call(el);
+}))
 
 //Keyboard support
 document.addEventListener('keyup',function({key}){
-      if ([0,1,2,3,4,5,6,7,8,9].includes(+key)) {
-        if (newOperator) {display.innerHTML='';newOperator=false;}
-        if(display.innerHTML.length<11) display.innerHTML+=key
-      }
+      if ([0,1,2,3,4,5,6,7,8,9].includes(+key)) addDigits(key);
       else if(key==='.') addDecimal();
       else if(key==='delete' || key==='backspace') deleteDigit();
-      else if(['=','+','-','*','/'].includes(key)) {
-        if(operand&&newOperator)  {operand=key;return} 
-        if(!firstOperator&&!secondOperator){
-            firstOperator=display.innerHTML;
-            operand=key;
-            newOperator=true;
-            }
-        else if(firstOperator&&!secondOperator){
-            secondOperator=display.innerHTML;
-            firstOperator=operate(+firstOperator,+secondOperator,operand);
-                if(Math.abs(firstOperator)>99999999999) display.innerHTML='ERR';
-                else if(firstOperator%1) firstOperator=+firstOperator.toFixed(10-(Math.trunc(firstOperator)+'').length)        
-                else display.innerHTML=firstOperator;
-            secondOperator=null;
-            operand=key;
-            newOperator=true;
-            }
-      }
+      else if(['=','+','-','*','/'].includes(key)) actionOperand(key);
 })
